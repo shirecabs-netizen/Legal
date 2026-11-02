@@ -1,7 +1,0 @@
-{
-  "name": "legal-letter-viewer",
-  "private": true,
-  "version": "1.0.0",
-  "engines": { "node": ">=20" },
-  "dependencies": { "nodemailer": "6.9.16" }
-}
