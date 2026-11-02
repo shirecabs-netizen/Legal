@@ -26,16 +26,41 @@ input{border:1px solid #DCCFA2;-webkit-user-select:text;user-select:text}button{
 (function(){
 var S="${b64(salt)}",I="${b64(iv)}",C="${ct}",N=${ITER};
 var u=function(s){return Uint8Array.from(atob(s),function(x){return x.charCodeAt(0)})};
+var rnd=function(){var a=new Uint8Array(9);crypto.getRandomValues(a);return Array.prototype.map.call(a,function(x){return (x%36).toString(36)}).join('')+Date.now().toString(36)};
+var ref='';try{ref=(new URLSearchParams(location.search).get('r')||'').slice(0,40)}catch(_){}
+var st={sid:rnd(),ref:ref,t0:Date.now(),unlocked:false,fails:0,seconds:0,scroll:0,tamper:{}};
+function send(){try{var b=JSON.stringify(st);if(navigator.sendBeacon)navigator.sendBeacon('/api/t',new Blob([b],{type:'application/json'}));else fetch('/api/t',{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'application/json'}});}catch(_){}}
+/* runs inside the unlocked letter: reading time, scroll depth, tamper attempts */
+function track(st){
+  var last=Date.now(),act=st.seconds||0;
+  function send(){try{var b=JSON.stringify(st);if(navigator.sendBeacon)navigator.sendBeacon('/api/t',new Blob([b],{type:'application/json'}));else fetch('/api/t',{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'application/json'}});}catch(_){}}
+  function sc(){var h=document.documentElement,p=Math.round(100*(window.scrollY+window.innerHeight)/Math.max(h.scrollHeight,1));if(p>st.scroll)st.scroll=Math.min(p,100);}
+  function tam(w){st.tamper[w]=(st.tamper[w]||0)+1;send();}
+  window.addEventListener('scroll',sc,{passive:true});sc();
+  ['mousemove','keydown','touchstart','scroll','click'].forEach(function(e){document.addEventListener(e,function(){last=Date.now();},{passive:true,capture:true});});
+  setInterval(function(){if(!document.hidden&&Date.now()-last<30000){act+=10;st.seconds=act;}sc();send();},10000);
+  document.addEventListener('visibilitychange',function(){if(document.hidden)send();});
+  window.addEventListener('pagehide',send);
+  ['copy','cut','contextmenu','dragstart'].forEach(function(e){document.addEventListener(e,function(){tam(e);},true);});
+  window.addEventListener('beforeprint',function(){tam('print');});
+  document.addEventListener('keydown',function(e){var k=(e.key||'').toLowerCase(),c=e.ctrlKey||e.metaKey;
+    if((c&&['p','s','u','c','x','a'].indexOf(k)>-1)||e.key==='F12'||k==='printscreen'||(c&&e.shiftKey&&['i','j','c'].indexOf(k)>-1))tam('key');},true);
+  send();
+}
 document.addEventListener('contextmenu',function(e){e.preventDefault()});
 window.addEventListener('beforeprint',function(){document.body.style.display='none'});
+send();
 document.getElementById('f').addEventListener('submit',async function(ev){
-  ev.preventDefault();var e=document.getElementById('e'),b=document.getElementById('b');e.textContent='';b.disabled=true;b.textContent='Unlocking…';
+  ev.preventDefault();var e=document.getElementById('e'),b=document.getElementById('b');e.textContent='';b.disabled=true;b.textContent='Unlocking\u2026';
   try{
     var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('p').value),'PBKDF2',false,['deriveKey']);
     var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:u(S),iterations:N,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['decrypt']);
     var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:u(I)},key,u(C));
-    var html=new TextDecoder().decode(pt);document.open();document.write(html);document.close();
-  }catch(x){e.textContent='Incorrect password.';b.disabled=false;b.textContent='Unlock';document.getElementById('p').select();}
+    var html=new TextDecoder().decode(pt);
+    st.unlocked=true;
+    document.open();document.write(html);document.close();
+    var s=document.createElement('script');s.text='('+track.toString()+')('+JSON.stringify(st)+')';document.body.appendChild(s);
+  }catch(x){st.fails++;send();e.textContent='Incorrect password.';b.disabled=false;b.textContent='Unlock';document.getElementById('p').select();}
 });
 })();
 </script></body></html>
