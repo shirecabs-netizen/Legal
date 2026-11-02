@@ -20,11 +20,14 @@ h1{font-size:1.2rem;margin:0 0 .6rem;color:#0A3A2B}input,button{font:inherit;wid
 input{border:1px solid #DCCFA2;-webkit-user-select:text;user-select:text}button{background:#0A3A2B;color:#fff;border:0;cursor:pointer}
 .e{color:#A61C1C;min-height:1.4em;margin:.6rem 0 0}@media print{body>*{display:none!important}}
 </style></head><body>
+<noscript><style>#f{display:none!important}</style><div class="c"><h1>JavaScript is required</h1><p>This document cannot be displayed because JavaScript is turned off or blocked in your browser.</p><p>To view it: enable JavaScript for this site (or disable any script-blocking extension such as NoScript, uBlock or Brave Shields for <strong>legal.shire.taxi</strong>), then reload the page.</p></div></noscript>
+<div class="c" id="unsupported" style="display:none"><h1>Browser not supported</h1><p>This document needs a current browser (Chrome, Edge, Firefox or Safari) opened over a secure (https) connection, with JavaScript enabled. Please update your browser or switch to one of these, then reload.</p></div>
 <form class="c" id="f" autocomplete="off"><h1>Protected document</h1><p>Enter the password you were given to open this letter.</p>
 <input type="password" id="p" placeholder="Password" required autofocus><button id="b">Unlock</button><p class="e" id="e" role="alert"></p></form>
 <script>
 (function(){
 var S="${b64(salt)}",I="${b64(iv)}",C="${ct}",N=${ITER};
+if(!(window.crypto&&crypto.subtle&&window.TextDecoder&&window.Uint8Array)){document.getElementById('f').style.display='none';document.getElementById('unsupported').style.display='block';return;}
 var u=function(s){return Uint8Array.from(atob(s),function(x){return x.charCodeAt(0)})};
 var rnd=function(){var a=new Uint8Array(9);crypto.getRandomValues(a);return Array.prototype.map.call(a,function(x){return (x%36).toString(36)}).join('')+Date.now().toString(36)};
 var ref='';try{ref=(new URLSearchParams(location.search).get('r')||'').slice(0,40)}catch(_){}
