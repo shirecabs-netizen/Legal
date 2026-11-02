@@ -63,6 +63,11 @@ document.getElementById('f').addEventListener('submit',async function(ev){
     st.unlocked=true;
     document.open();document.write(html);document.close();
     var s=document.createElement('script');s.text='('+track.toString()+')('+JSON.stringify(st)+')';document.body.appendChild(s);
+    /* Microsoft Clarity: started only after unlock; all text masked in recordings */
+    document.body.setAttribute('data-clarity-mask','True');
+    var cl=document.createElement('script');
+    cl.text='(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z7b90ckzkl");clarity("set","recipient",'+JSON.stringify(st.ref||'none')+');clarity("set","sid",'+JSON.stringify(st.sid)+');';
+    document.head.appendChild(cl);
   }catch(x){st.fails++;send();e.textContent='Incorrect password.';b.disabled=false;b.textContent='Unlock';document.getElementById('p').select();}
 });
 })();
