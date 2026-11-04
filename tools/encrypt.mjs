@@ -68,6 +68,24 @@ document.getElementById('f').addEventListener('submit',async function(ev){
     var cl=document.createElement('script');
     cl.text='(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z7b90ckzkl");clarity("set","recipient",'+JSON.stringify(st.ref||'none')+');clarity("set","sid",'+JSON.stringify(st.sid)+');';
     document.head.appendChild(cl);
+    /* single "Save as PDF" button: prints a clean copy of the letter from a hidden frame */
+    var pb=document.createElement('button');pb.type='button';pb.textContent='Save as PDF';
+    pb.setAttribute('style','position:fixed;top:12px;right:16px;z-index:100;padding:.55rem 1rem;background:#0A3A2B;color:#fff;border:2px solid #C9A227;border-radius:4px;font:600 14px Bahnschrift,"Segoe UI",Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);-webkit-user-select:none;user-select:none');
+    pb.addEventListener('click',function(){
+      var f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.setAttribute('tabindex','-1');
+      f.style.cssText='position:fixed;left:-9999px;top:0;width:1100px;height:800px;border:0';
+      document.body.appendChild(f);
+      var d=f.contentDocument;d.open();d.write(html.replace(new RegExp('<script[\\\\s\\\\S]*?<'+'/script>','gi'),''));d.close();
+      d.documentElement.className='ok';
+      [].slice.call(d.styleSheets).forEach(function(sh){try{for(var i=sh.cssRules.length-1;i>=0;i--){var r=sh.cssRules[i];if(r.media&&/print/.test(r.media.mediaText))sh.deleteRule(i);}}catch(e){}});
+      var ps=d.createElement('style');
+      ps.textContent='.side,.mbar,.nojs,.shield,.wm{display:none!important}html,body{background:#fff!important}.sheet{margin:0!important;max-width:none!important;box-shadow:none!important}@page{margin:14mm}';
+      d.head.appendChild(ps);
+      f.contentWindow.addEventListener('afterprint',function(){setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},500)});
+      setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print();}catch(e){}try{window.focus();}catch(e){}},400);
+      setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},300000);
+    });
+    document.body.appendChild(pb);
   }catch(x){st.fails++;send();e.textContent='Incorrect password.';b.disabled=false;b.textContent='Unlock';document.getElementById('p').select();}
 });
 })();
