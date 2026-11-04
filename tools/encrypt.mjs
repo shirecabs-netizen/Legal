@@ -70,7 +70,7 @@ document.getElementById('f').addEventListener('submit',async function(ev){
     document.head.appendChild(cl);
     /* single "Save as PDF" button: prints a clean copy of the letter from a hidden frame */
     var pb=document.createElement('button');pb.type='button';pb.textContent='Save as PDF';
-    pb.setAttribute('style','position:fixed;top:12px;right:16px;z-index:100;padding:.55rem 1rem;background:#0A3A2B;color:#fff;border:2px solid #C9A227;border-radius:4px;font:600 14px Bahnschrift,"Segoe UI",Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);-webkit-user-select:none;user-select:none');
+    pb.setAttribute('style','position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100;padding:.55rem 1rem;background:#0A3A2B;color:#fff;border:2px solid #C9A227;border-radius:4px;font:600 14px Bahnschrift,"Segoe UI",Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);-webkit-user-select:none;user-select:none');
     pb.addEventListener('click',function(){
       var f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.setAttribute('tabindex','-1');
       f.style.cssText='position:fixed;left:-9999px;top:0;width:1100px;height:800px;border:0';
