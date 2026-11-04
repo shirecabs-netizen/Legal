@@ -39,6 +39,7 @@ function track(st){
   function send(){try{var b=JSON.stringify(st);if(navigator.sendBeacon)navigator.sendBeacon('/api/t',new Blob([b],{type:'application/json'}));else fetch('/api/t',{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'application/json'}});}catch(_){}}
   function sc(){var h=document.documentElement,p=Math.round(100*(window.scrollY+window.innerHeight)/Math.max(h.scrollHeight,1));if(p>st.scroll)st.scroll=Math.min(p,100);}
   function tam(w){st.tamper[w]=(st.tamper[w]||0)+1;send();}
+  window.__lvPdf=function(){tam('pdf');};
   window.addEventListener('scroll',sc,{passive:true});sc();
   ['mousemove','keydown','touchstart','scroll','click'].forEach(function(e){document.addEventListener(e,function(){last=Date.now();},{passive:true,capture:true});});
   setInterval(function(){if(!document.hidden&&Date.now()-last<30000){act+=10;st.seconds=act;}sc();send();},10000);
@@ -72,6 +73,7 @@ document.getElementById('f').addEventListener('submit',async function(ev){
     var pb=document.createElement('button');pb.type='button';pb.textContent='Save as PDF';
     pb.setAttribute('style','position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100;padding:.55rem 1rem;background:#0A3A2B;color:#fff;border:2px solid #C9A227;border-radius:4px;font:600 14px Bahnschrift,"Segoe UI",Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);-webkit-user-select:none;user-select:none');
     pb.addEventListener('click',function(){
+      try{if(window.__lvPdf)window.__lvPdf();}catch(e){}
       var f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.setAttribute('tabindex','-1');
       f.style.cssText='position:fixed;left:-9999px;top:0;width:1100px;height:800px;border:0';
       document.body.appendChild(f);
