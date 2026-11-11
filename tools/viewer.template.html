@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><title>Letter Before Claim | HV0053 / DG66 YLA</title>
+<style>
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:#EDE4CC;color:#1F1B14;font:16px/1.55 Calibri,Carlito,"Segoe UI",Arial,sans-serif}
+.c{background:#FFFDF5;border-top:6px solid #0A3A2B;max-width:420px;width:100%;padding:1.8rem;box-shadow:0 2px 14px rgba(0,0,0,.15)}
+h1{font-size:1.2rem;margin:0 0 .6rem;color:#0A3A2B}input,button{font:inherit;width:100%;padding:.7rem .8rem;margin-top:.7rem}
+input{border:1px solid #DCCFA2;-webkit-user-select:text;user-select:text}button{background:#0A3A2B;color:#fff;border:0;cursor:pointer}
+.e{color:#A61C1C;min-height:1.4em;margin:.6rem 0 0}@media print{body>*{display:none!important}}
+</style></head><body>
+<noscript><style>#f{display:none!important}</style><div class="c"><h1>JavaScript is required</h1><p>This document cannot be displayed because JavaScript is turned off or blocked in your browser.</p><p>To view it: enable JavaScript for this site (or disable any script-blocking extension such as NoScript, uBlock or Brave Shields for <strong>legal.shire.taxi</strong>), then reload the page.</p></div></noscript>
+<div class="c" id="unsupported" style="display:none"><h1>Browser not supported</h1><p>This document needs a current browser (Chrome, Edge, Firefox or Safari) opened over a secure (https) connection, with JavaScript enabled. Please update your browser or switch to one of these, then reload.</p></div>
+<form class="c" id="f" autocomplete="off"><h1>Protected document</h1><p>Enter the password you were given to open this letter.</p>
+<input type="password" id="p" placeholder="Password" required autofocus><button id="b">Unlock</button><p class="e" id="e" role="alert"></p></form>
+<script>
+(function(){
+var S="@@SALT@@",I="@@IV@@",C="@@CT@@",N=@@ITER@@;
+if(!(window.crypto&&crypto.subtle&&window.TextDecoder&&window.Uint8Array)){document.getElementById('f').style.display='none';document.getElementById('unsupported').style.display='block';return;}
+var u=function(s){return Uint8Array.from(atob(s),function(x){return x.charCodeAt(0)})};
+var rnd=function(){var a=new Uint8Array(9);crypto.getRandomValues(a);return Array.prototype.map.call(a,function(x){return (x%36).toString(36)}).join('')+Date.now().toString(36)};
+var ref='';try{ref=(new URLSearchParams(location.search).get('r')||'').slice(0,40)}catch(_){}
+var st={sid:rnd(),ref:ref,t0:Date.now(),unlocked:false,fails:0,seconds:0,scroll:0,tamper:{}};
+var T=[],cur=0;
+function send(){try{var b=JSON.stringify(st);if(navigator.sendBeacon)navigator.sendBeacon('/api/t',new Blob([b],{type:'application/json'}));else fetch('/api/t',{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'application/json'}});}catch(_){}}
+
+/* Runs inside the unlocked letter: reading time, scroll depth, tamper attempts.
+   Safe to run again after a tab switch: window-level state is created once, document-level listeners are re-bound. */
+function track(st0){
+  var W=window,L=W.__lv;
+  if(!L){
+    L=W.__lv={st:st0,last:Date.now(),act:st0.seconds||0};
+    L.send=function(){try{var b=JSON.stringify(L.st);if(navigator.sendBeacon)navigator.sendBeacon('/api/t',new Blob([b],{type:'application/json'}));else fetch('/api/t',{method:'POST',body:b,keepalive:true,headers:{'Content-Type':'application/json'}});}catch(_){}};
+    L.sc=function(){var h=document.documentElement,p=Math.round(100*(W.scrollY+W.innerHeight)/Math.max(h.scrollHeight,1));if(p>L.st.scroll)L.st.scroll=Math.min(p,100);};
+    L.tam=function(w){L.st.tamper[w]=(L.st.tamper[w]||0)+1;L.send();};
+    W.addEventListener('scroll',L.sc,{passive:true});
+    setInterval(function(){if(!document.hidden&&Date.now()-L.last<30000){L.act+=10;L.st.seconds=L.act;}L.sc();L.send();},10000);
+    W.addEventListener('pagehide',L.send);
+    W.addEventListener('beforeprint',function(){L.tam('print');});
+  }
+  ['mousemove','keydown','touchstart','scroll','click'].forEach(function(e){document.addEventListener(e,function(){L.last=Date.now();},{passive:true,capture:true});});
+  document.addEventListener('visibilitychange',function(){if(document.hidden)L.send();});
+  ['copy','cut','contextmenu','dragstart'].forEach(function(e){document.addEventListener(e,function(){L.tam(e);},true);});
+  document.addEventListener('keydown',function(e){var k=(e.key||'').toLowerCase(),c=e.ctrlKey||e.metaKey;
+    if((c&&['p','s','u','c','x','a'].indexOf(k)>-1)||e.key==='F12'||k==='printscreen'||(c&&e.shiftKey&&['i','j','c'].indexOf(k)>-1))L.tam('key');},true);
+  W.__lvPdf=function(){L.tam('pdf');};
+  W.__lvTab=function(id){L.tam('tab_'+id);};
+  L.sc();L.send();
+}
+
+/* layout offsets for the tab bar, injected only when there is more than one letter */
+var TABCSS=':root{--tabs:42px}body{padding-top:var(--tabs)!important}html{scroll-padding-top:calc(var(--tabs) + 1.2rem)!important}.side{top:var(--tabs)!important}'
++'@media(max-width:1250px){html{scroll-padding-top:calc(var(--tabs) + var(--bar) + 1rem)!important}.mbar{top:var(--tabs)!important}.side{top:calc(var(--tabs) + var(--bar))!important;max-height:calc(100vh - var(--tabs) - var(--bar) - 8px)!important;max-height:calc(100dvh - var(--tabs) - var(--bar) - 8px)!important}}'
++'#lvtabs{position:fixed;top:0;left:0;right:0;height:var(--tabs);z-index:60;display:flex;background:#0A3A2B;border-bottom:3px solid #C9A227;font:600 14px Bahnschrift,"Segoe UI",Arial,sans-serif;overflow-x:auto}'
++'#lvtabs button{flex:0 0 auto;padding:0 1.15rem;margin:0;border:0;border-right:1px solid rgba(217,181,74,.25);background:transparent;color:#BFD0C4;font:inherit;cursor:pointer;white-space:nowrap}'
++'#lvtabs button[aria-selected=true]{background:#14573F;color:#fff;box-shadow:inset 0 -3px 0 #D9B54A}'
++'#lvtabs .sub{margin-left:.55rem;font-weight:400;opacity:.75;font-size:12px}'
++'@media(max-width:600px){#lvtabs button{padding:0 .8rem}#lvtabs .sub{display:none}}';
+
+function addTabBar(){
+  var bar=document.createElement('div');bar.id='lvtabs';bar.setAttribute('role','tablist');
+  T.forEach(function(t,k){
+    var b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-selected',k===cur?'true':'false');
+    var l=document.createElement('span');l.textContent=t.label;b.appendChild(l);
+    if(t.sub){var s=document.createElement('span');s.className='sub';s.textContent=t.sub;b.appendChild(s);}
+    b.addEventListener('click',function(){if(k!==cur)show(k);});
+    bar.appendChild(b);
+  });
+  document.body.appendChild(bar);
+}
+
+/* single "Save as PDF" button: prints a clean copy of the letter on screen, from a hidden frame */
+function addPdfButton(){
+  var pb=document.createElement('button');pb.type='button';pb.textContent='Save as PDF';
+  pb.setAttribute('style','position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100;padding:.55rem 1rem;background:#0A3A2B;color:#fff;border:2px solid #C9A227;border-radius:4px;font:600 14px Bahnschrift,"Segoe UI",Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);-webkit-user-select:none;user-select:none');
+  pb.addEventListener('click',function(){
+    try{if(window.__lvPdf)window.__lvPdf();}catch(e){}
+    var f=document.createElement('iframe');f.setAttribute('aria-hidden','true');f.setAttribute('tabindex','-1');
+    f.style.cssText='position:fixed;left:-9999px;top:0;width:1100px;height:800px;border:0';
+    document.body.appendChild(f);
+    var d=f.contentDocument;d.open();d.write(T[cur].html.replace(new RegExp('<script[\\s\\S]*?<'+'/script>','gi'),''));d.close();
+    d.documentElement.className='ok';
+    [].slice.call(d.styleSheets).forEach(function(sh){try{for(var i=sh.cssRules.length-1;i>=0;i--){var r=sh.cssRules[i];if(r.media&&/print/.test(r.media.mediaText))sh.deleteRule(i);}}catch(e){}});
+    var ps=d.createElement('style');
+    ps.textContent='.side,.mbar,.nojs,.shield,.wm{display:none!important}html,body{background:#fff!important}.sheet{margin:0!important;max-width:none!important;box-shadow:none!important}@page{margin:14mm}';
+    d.head.appendChild(ps);
+    f.contentWindow.addEventListener('afterprint',function(){setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},500)});
+    setTimeout(function(){try{f.contentWindow.focus();f.contentWindow.print();}catch(e){}try{window.focus();}catch(e){}},400);
+    setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},300000);
+  });
+  document.body.appendChild(pb);
+}
+
+/* Microsoft Clarity: started only after unlock; all text masked in recordings */
+function startClarity(){
+  document.body.setAttribute('data-clarity-mask','True');
+  if(window.__clar){try{window.clarity&&window.clarity('set','tab',T[cur].id);}catch(e){}return;}
+  window.__clar=1;
+  var cl=document.createElement('script');
+  cl.text='(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z7b90ckzkl");clarity("set","recipient",'+JSON.stringify(st.ref||'none')+');clarity("set","sid",'+JSON.stringify(st.sid)+');clarity("set","tab",'+JSON.stringify(T[cur].id)+');';
+  document.head.appendChild(cl);
+}
+
+function show(i){
+  cur=i;
+  var h=T[i].html;
+  if(T.length>1)h=h.replace('</head>',function(){return '<style>'+TABCSS+'</style></head>';});
+  document.open();document.write(h);document.close();
+  try{
+    var s=document.createElement('script');s.text='('+track.toString()+')('+JSON.stringify(st)+')';document.body.appendChild(s);
+    if(window.__lvTab)window.__lvTab(T[i].id);
+    startClarity();
+    if(T.length>1)addTabBar();
+    addPdfButton();
+    window.scrollTo(0,0);
+  }catch(e){}
+}
+
+document.addEventListener('contextmenu',function(e){e.preventDefault()});
+window.addEventListener('beforeprint',function(){document.body.style.display='none'});
+send();
+document.getElementById('f').addEventListener('submit',async function(ev){
+  ev.preventDefault();var e=document.getElementById('e'),b=document.getElementById('b');e.textContent='';b.disabled=true;b.textContent='Unlocking…';
+  var pack=null;
+  try{
+    var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(document.getElementById('p').value),'PBKDF2',false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:u(S),iterations:N,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['decrypt']);
+    var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:u(I)},key,u(C));
+    pack=JSON.parse(new TextDecoder().decode(pt));
+  }catch(x){st.fails++;send();e.textContent='Incorrect password.';b.disabled=false;b.textContent='Unlock';document.getElementById('p').select();return;}
+  T=pack.tabs;st.unlocked=true;
+  show(0);
+});
+})();
+</script></body></html>
