@@ -167,13 +167,13 @@ class Doc:
 
 
 LABELS = [
-    (re.compile(r'^7\([a-e]\)\([ivx]+\)\t'), 'np l1 wide'),
+    (re.compile(r'^7\([a-z]\)\([ivx]+\)\t'), 'np l1 wide'),
     (re.compile(r'^\d+\.\d+\.\d+\t'), 'np l2'),
     (re.compile(r'^\d+\.\d+\t'), 'np l1'),
     (re.compile(r'^\([ivx]+\)\t'), 'np rom'),
-    (re.compile(r'^Ground [A-E]\t'), 'np li'),
+    (re.compile(r'^Ground [A-Z]\t'), 'np li'),
     (re.compile(r'^▪\t'), 'np bul'),
-    (re.compile(r'^[A-P]\.\t'), 'np li'),
+    (re.compile(r'^[A-Z]\.\t'), 'np li'),
     (re.compile(r'^\d+\.\t'), 'np li'),
 ]
 
@@ -335,7 +335,7 @@ def convert(template_path, docx_path, out_path):
                     cells = []
                     for n, tc in enumerate(tr.findall(qn('w:tc'))):
                         inner = '<br>'.join(D.render(D.tokens(p)) for p in cell_paras(tc) if D.plain(D.tokens(p)).strip())
-                        if n == 0 and '<strong>' not in inner:
+                        if n == 0 and '<strong>' not in inner and '<em>' not in inner:
                             inner = '<strong>%s</strong>' % inner
                         cells.append('<td>%s</td>' % inner)
                     trs.append('<tr>%s</tr>' % ''.join(cells))
