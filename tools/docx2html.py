@@ -166,15 +166,17 @@ class Doc:
         return s.get(qn('w:val')) if s is not None else 'Normal'
 
 
+# A label (number / roman / letter) is separated from its text by a tab, or by a run of 2+ spaces
+SEP = r'(?:\t|[ \u00a0]{2,})'
 LABELS = [
-    (re.compile(r'^7\([a-z]\)\([ivx]+\)\t'), 'np l1 wide'),
-    (re.compile(r'^\d+\.\d+\.\d+\t'), 'np l2'),
-    (re.compile(r'^\d+\.\d+\t'), 'np l1'),
-    (re.compile(r'^\([ivx]+\)\t'), 'np rom'),
-    (re.compile(r'^Ground [A-Z]\t'), 'np li'),
-    (re.compile(r'^▪\t'), 'np bul'),
-    (re.compile(r'^[A-Z]\.\t'), 'np li'),
-    (re.compile(r'^\d+\.\t'), 'np li'),
+    (re.compile(r'^7\([a-z]\)\([ivx]+\)' + SEP), 'np l1 wide'),
+    (re.compile(r'^\d+\.\d+\.\d+' + SEP), 'np l2'),
+    (re.compile(r'^\d+\.\d+' + SEP), 'np l1'),
+    (re.compile(r'^\([ivx]+\)' + SEP), 'np rom'),
+    (re.compile(r'^Ground [A-Z]' + SEP), 'np li'),
+    (re.compile('^\u25aa' + SEP), 'np bul'),
+    (re.compile(r'^[A-Z]\.' + SEP), 'np li'),
+    (re.compile(r'^\d+\.' + SEP), 'np li'),
 ]
 
 
@@ -182,7 +184,7 @@ def para_class(text, ind):
     for rx, cls in LABELS:
         m = rx.match(text)
         if m:
-            if cls == 'np li' and re.match(r'^\d+\.\t', text) and ind >= 90:
+            if cls == 'np li' and re.match(r'^\d+\.' + SEP, text) and ind >= 90:
                 cls = 'np rom'
             return m, cls
     return None, None
@@ -287,7 +289,7 @@ def convert(template_path, docx_path, out_path):
         else:
             lvl = 'l3'
         if lvl in ('l1', 'l2'):
-            tn, tt = (re.split(r'\t+', t, maxsplit=1) + [''])[:2]
+            tn, tt = (re.split(r'\t+|[ \u00a0]{2,}', t.strip(), maxsplit=1) + [''])[:2]
         elif lvl == 'l3':
             m = re.match(r'^([A-Z])\s+(.*)$', t.strip())
             tn, tt = (m.group(1), m.group(2)) if m else ('', t.strip())
@@ -359,7 +361,7 @@ def convert(template_path, docx_path, out_path):
         if st == 'Heading1':
             if sec_open:
                 out.append('</section>')
-            num, title = (re.split(r'\t+', t, maxsplit=1) + [''])[:2]
+            num, title = (re.split(r'\t+|[ \u00a0]{2,}', t.strip(), maxsplit=1) + [''])[:2]
             cur_sec = int(re.match(r'\d+', num).group(0))
             bid = bms[0] if bms else 's_%s' % num
             out.append('<section class="sec" id="%s"><h2 class="h1"><span class="n">%s</span><span class="tt">%s</span></h2>'
@@ -367,7 +369,7 @@ def convert(template_path, docx_path, out_path):
             sec_open = True
             continue
         if st == 'Heading2':
-            num, title = (re.split(r'\t+', t, maxsplit=1) + [''])[:2]
+            num, title = (re.split(r'\t+|[ \u00a0]{2,}', t.strip(), maxsplit=1) + [''])[:2]
             bid = bms[0] if bms else 's_%s' % num.replace('.', '_')
             out.append('<h3 class="h2" id="%s"><span class="n">%s</span><span class="tt">%s</span></h3>'
                        % (bid, esc(num), esc(title.strip())))
